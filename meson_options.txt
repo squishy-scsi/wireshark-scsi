@@ -1,0 +1,14 @@
+option(
+	'mtune',
+	type: 'combo',
+	choices: ['default', 'x86-64', 'x86-64-v2', 'x86-64-v3', 'x86-64-v4', 'native'],
+	value: 'default',
+	description: 'Specify the -mtune param to use in supported compilers'
+)
+
+option(
+	'bugreport_url',
+	type: 'string',
+	value: 'https://github.com/squishy-scsi/wireshark-scsi/issues/new',
+	description: 'URL for bug report submissions'
+)
