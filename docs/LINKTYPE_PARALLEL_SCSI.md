@@ -5,15 +5,12 @@
 > If you are adding support to your application, make sure to note which version of this document you're
 > implementing, (use the git rev for the version in this repo).
 
-
 This document defines a [tcpdump] [`LINKTYPE_`] to encapsulate raw SCSI traffic. This is done by adding framing around the raw SCSI commands and bus status with [Transfer Frames], potentially able to represent an almost full reconstruction of the state of the SCSI bus.
-
 
 This is being done for a few reasons:
 
 1. There are no existing raw SCSI dissectors, they all operate off of either [Fibre Channel], [iSCSI], or [something else].
 2. Existing SCSI dissectors rely on either explicit setting of what type of SCSI traffic is there or the lower-level framing (see 1)
-
 
 While out of place, we also define [ancillary information] on how we expect to store SCSI captures within [PCAPNG] files, such as values for the [Interface Description Block] and it's associated [Option Blocks].
 
@@ -29,6 +26,7 @@ You can find example and test PCAPNG files in the [`examples`] directory in the 
 > The frame layout, fields, and diagrams are all in **BIG ENDIAN** (also known as [network order])
 
 The following types are used within the definition of the the `LINKTYPE_PARALLEL_SCSI` frames and fields:
+
 * `i8`/`u8`: signed/unsigned 8-bit (1 byte/octet) integer type.
 * `i16`/`u16`: signed/unsigned 16-bit (2 byte/octet) integer type.
 * `i24`/`u24`: signed/unsigned 24-bit (3 byte/octet) integer type.
@@ -116,6 +114,7 @@ When storing `LINKTYPE_PARALLEL_SCSI` frames into [PCAPNG] files for use in prot
 #### Interface Description Block
 
 The [Interface Description Block] is configured as follows:
+
 * The `LinkType` field is set to `DLT_USER7` (`154`)
   > **NOTE:** See the [Standardization] section for notes about reserved DLT use
 * `SnapLen` should be set to `0`.
@@ -130,6 +129,7 @@ The [Interface Description Block] is configured as follows:
 #### Enhanced Packet Blocks
 
 The [Enhanced Packet Blocks] are used to encapsulate the `LINKTYPE_PARALLEL_SCSI` [Transfer Frames], they should be configures as follows:
+
 * The `Interface ID` field set to the appropriate SCSI Bus ID
   > **NOTE:** This is not the ID of the *device* on the SCSI bus, but the ID of the SCSI bus itself which is described by the Interface Description Block. see [multi-bus capture] for further information.
 * `Captured Packet Length` and `Original Packet Length` should be set to the size of transfer frame in this packet.
@@ -142,11 +142,9 @@ The [Enhanced Packet Blocks] are used to encapsulate the `LINKTYPE_PARALLEL_SCSI
 * The any reasonable [`EPB` options] may be set, but are optional.
   > Notably the [`epb_flags`] option has some useful information in it, but it may not be applicable
 
-
 #### Interface Statistics Block
 
 If present, the [Interface Statistics Block] is configured sensibly, the `Interface ID` field is set to the appropriate Bus ID (Usually `0` for a signal-bus capture), and the [statistics options] that are relevant are set. It is recommended that [`isb_starttime`] and [`isb_endtime`] are set if this block is present at all for any other statistical data (such as [`isb_ifrecv`]).
-
 
 #### Options Definitions
 
@@ -170,6 +168,7 @@ It is defined below:
    ╰───────────────────────────────────────────────────────────────╯
 
 ```
+
 * `0x0BAD`
   > The [copyable custom option] code for [PCAPNG]
 * `0x0010`
@@ -179,6 +178,7 @@ It is defined below:
 * `0x0000`
   > The Option Sub-ID for this option. Allows for multiple different Shrine Maiden Heavy Industries PCAPNG Option types.
 * Bus Flags (`f16`)
+
   ```
     0         0                   1
     0         7                   5
@@ -195,6 +195,7 @@ It is defined below:
     │                                                   40 (011) / 80 (100) / 160 (101)  ├─ Bus Clock
     ╰──────────────────────────────── Bus data-rate:   SDR (  0) / DDR (  1)            ─╯
   ```
+
   > When this field is initialized to all `0`'s, it represents a valid SCSI-1 `HVD` bus, however, not all combinations of
   > flags are valid, for instance, setting `HVD` while also having set the bus speed to `160MHz DDR` is not a possible
   > SCSI bus.
@@ -267,17 +268,17 @@ The following software supports emitting SCSI captures with `LINKTYPE_PARALLEL_S
 The following software supports consuming and dissecting SCSI captures with `LINKTYPE_PARALLEL_SCSI` framing.
 
 * [wireshark-scsi]
-   * SCSI Framer and higher-level dissectors as a part of this repo to add support to [Wireshark]
+  * SCSI Framer and higher-level dissectors as a part of this repo to add support to [Wireshark]
 
 [tcpdump]: https://www.tcpdump.org/
 [`LINKTYPE_`]: https://www.tcpdump.org/linktypes.html
-[Transfer Frames]: #transaction-frame
+[Transfer Frames]: #transfer-frame
 [Fibre Channel]: https://wiki.wireshark.org/FibreChannel
 [iSCSI]: https://wiki.wireshark.org/iSCSI
 [something else]: https://wiki.wireshark.org/Small_Computer_System_Interface
 [network order]: https://www.rfc-editor.org/rfc/rfc1700.html#:~:text=Standards%22%20(STD%201).-,Data%20Notations,-The%20convention%20in
-[multi-bus capture]: #Multi-bus-Captures
-[ancillary information]: #Frame-Capture-Storage
+[multi-bus capture]: #multi-bus-captures
+[ancillary information]: #frame-capture-storage
 [PCAPNG Block alignment requirements]: https://www.ietf.org/archive/id/draft-ietf-opsawg-pcapng-02.html#name-alignment
 [Interface Description Block]: https://www.ietf.org/archive/id/draft-ietf-opsawg-pcapng-02.html#section_idb
 [`if_name`]: https://www.ietf.org/archive/id/draft-ietf-opsawg-pcapng-02.html#section-4.2-11
@@ -293,7 +294,7 @@ The following software supports consuming and dissecting SCSI captures with `LIN
 [Enhanced Packet Blocks]: https://www.ietf.org/archive/id/draft-ietf-opsawg-pcapng-02.html#name-enhanced-packet-block
 [`EPB` options]: https://www.ietf.org/archive/id/draft-ietf-opsawg-pcapng-02.html#section-4.3-7
 [`epb_flags`]: https://www.ietf.org/archive/id/draft-ietf-opsawg-pcapng-02.html#section-4.3-9
-[Bus Metadata]: #Options-Definitions
+[Bus Metadata]: #options-definitions
 [Section Header Block]: https://www.ietf.org/archive/id/draft-ietf-opsawg-pcapng-02.html#name-section-header-block
 [copyable custom option]: https://www.ietf.org/archive/id/draft-ietf-opsawg-pcapng-02.html#section-3.5.1-4.1.3
 [IANA]: https://www.iana.org/
