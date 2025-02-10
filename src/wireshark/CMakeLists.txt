@@ -4,13 +4,16 @@
 
 include(WiresharkPlugin)
 
-set_module_info(scsi 0 1 0 0)
+set_module_info(proto-scsi 0 1 0 0)
 
 add_definitions(-DWIRESHARK_VERSION_MAJOR=${PROJECT_MAJOR_VERSION} -DWIRESHARK_VERSION_MINOR=${PROJECT_MINOR_VERSION})
 
+set(DISSECTOR_SRC
+	proto-scsi.cc
+)
+
 set(PLUGIN_FILES
 	wireshark-scsi.cc
-	scsi-framer.cc
 	${DISSECTOR_SRCS}
 )
 
@@ -23,18 +26,18 @@ set_source_files_properties(
 )
 
 register_plugin_files(plugin.c
-	parallel_scsi
+	proto-scsi
 	${DISSECTOR_SRCS}
 )
 
-add_plugin_library(scsi epan)
-target_link_libraries(scsi epan)
-install_plugin(scsi epan)
+add_plugin_library(proto-scsi epan)
+target_link_libraries(proto-scsi epan)
+install_plugin(proto-scsi epan)
 
 file(GLOB DISSECTOR_HEADERS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "*.hh")
 CHECKAPI(
 	NAME
-		parallel_scsi
+		proto-scsi
 	SWITCHES
 		-g abort -g termoutput
 	SOURCES

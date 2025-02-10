@@ -49,15 +49,17 @@ configure_file(
 )
 
 srcs = files([
+	# LINKTYPE_PARALLEL_SCSI protocol definition
+	'proto-scsi.cc',
+	# Wireshark plugin entrypoint
 	'wireshark-scsi.cc',
-	'scsi-framer.cc',
 ])
 
 ws_version = wireshark.version()
 ws_version = ws_version.split('.')
 
 shared_library(
-	'parallel_scsi',
+	'proto-scsi',
 	srcs,
 	name_prefix: '',
 	cpp_args: [

@@ -3,7 +3,7 @@
 
 #include "config.hh"
 #include "common.hh"
-#include "scsi-framer.hh"
+#include "proto-scsi.hh"
 
 #include <wsutil/plugins.h>
 #include <epan/packet.h>
@@ -20,14 +20,13 @@ const char plugin_version[] = WS_SCSI_VERSION_FULL;
 const int plugin_want_major = WIRESHARK_VERSION_MAJOR;
 const int plugin_want_minor = WIRESHARK_VERSION_MINOR;
 
-/* LINKTYPE_PARALLEL_SCSI protocol */
-const static proto_plugin scsi_framer{
-	.register_protoinfo = ws_scsi::framer::register_protoinfo,
-	.register_handoff   = ws_scsi::framer::register_handoff
+const static proto_plugin proto_scsi{
+	.register_protoinfo = scsi::proto::register_protoinfo,
+	.register_handoff   = scsi::proto::register_handoff
 };
 
 void plugin_register() noexcept {
-	proto_register_plugin(&scsi_framer);
+	proto_register_plugin(&proto_scsi);
 }
 
 std::uint32_t plugin_describe() noexcept {
